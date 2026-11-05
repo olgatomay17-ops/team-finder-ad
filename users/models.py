@@ -5,7 +5,6 @@ import uuid
 from PIL import Image, ImageDraw, ImageFont
 from django.core.files.base import ContentFile
 from django.contrib.staticfiles import finders
-from django.templatetags.static import static
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
@@ -59,6 +58,12 @@ class User(AbstractUser):
     about = models.TextField('О себе', blank=True, max_length=256)
     phone = models.CharField('Телефон', max_length=12)
     github_url = models.URLField('GitHub', blank=True)
+    favorites = models.ManyToManyField(
+        'projects.Project',
+        related_name='favorited_by',
+        blank=True,
+        verbose_name='Избранные проекты'
+    )
 
     objects = UserManager()
 

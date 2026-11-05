@@ -21,7 +21,7 @@ class CustomLoginView(LoginView):
 
 
 class CustomLogoutView(LogoutView):
-     next_page = reverse_lazy('users:login')
+    next_page = reverse_lazy('users:login')
 
 
 class UserListView(ListView):
@@ -29,36 +29,33 @@ class UserListView(ListView):
     template_name = 'users/participants.html'
     paginate_by = 12
 
-    # def get_queryset(self):
-    #     qs = super().get_queryset()
-    #     filter_type = self.request.GET.get('filter')
+    def get_queryset(self):
+        qs = super().get_queryset()
+        filter_type = self.request.GET.get('filter')
 
-    #     if not self.request.user.is_authenticated:
-    #         return qs
+        if not self.request.user.is_authenticated:
+            return qs
 
-    #     user = self.request.user
+        user = self.request.user
 
-        # Project/Favorite — фильтры отключены.
-        # Когда создадим projects, раскомментируем:
-        #
-        # if filter_type == 'owners-of-favorite-projects':
-        #     qs = qs.filter(
-        #         owned_projects__in=user.favorite_projects.all()
-        #     ).distinct()
-        # elif filter_type == 'owners-of-participating-projects':
-        #     qs = qs.filter(
-        #         owned_projects__participants=user
-        #     ).distinct()
-        # elif filter_type == 'interested-in-my-projects':
-        #     qs = qs.filter(
-        #         favorite_projects__in=user.owned_projects.all()
-        #     ).distinct()
-        # elif filter_type == 'participants-of-my-projects':
-        #     qs = qs.filter(
-        #         participating_projects__in=user.owned_projects.all()
-        #     ).distinct()
+        if filter_type == 'owners-of-favorite-projects':
+            qs = qs.filter(
+                owned_projects__in=user.favorites.all()
+            ).distinct()
+        elif filter_type == 'owners-of-participating-projects':
+            qs = qs.filter(
+                owned_projects__participants=user
+            ).distinct()
+        elif filter_type == 'interested-in-my-projects':
+            qs = qs.filter(
+                favorites__in=user.owned_projects.all()
+            ).distinct()
+        elif filter_type == 'participants-of-my-projects':
+            qs = qs.filter(
+                participating_projects__in=user.owned_projects.all()
+            ).distinct()
 
-        # return qs
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -73,15 +70,12 @@ class UserListView(ListView):
 class UserDetailView(DetailView):
     model = User
     template_name = 'users/user-details.html'
-    context_object_name = 'user'
     pk_url_kwarg = 'pk'
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     if not hasattr(self.object, 'owned_projects'):
-    #         # Пока нет модели Project
-    #         context['owned_projects'] = []
-    #     return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['owned_projects'] = self.object.owned_projects.all().distinct()
+        return context
 
 
 class UserUdpateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -110,5 +104,5 @@ class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
 
 def get_profile_redirect(request):
     if not request.user.is_authenticated:
-        return redirect('user:login')
+        return redirect('users:login')
     return redirect('users:edit', pk=request.user.pk)
