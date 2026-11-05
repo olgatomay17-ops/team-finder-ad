@@ -12,6 +12,10 @@ DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'users.User'
+
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'projects:home'      # временно 'users:user_list', пока нет projects
+LOGOUT_REDIRECT_URL = 'users:login'
 # Application definition
 
 INSTALLED_APPS = [
@@ -35,6 +39,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "team_finder.urls"
+
+TEMPLATES_DIR = BASE_DIR / "templates_var1"
 
 TEMPLATES = [
     {
@@ -94,7 +100,7 @@ if not DEBUG:
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "ru-RU"
 
 TIME_ZONE = "UTC"
 

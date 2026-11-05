@@ -11,10 +11,10 @@ class UserSkillInline(admin.TabularInline):
 
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ('email', 'last_name', 'first_name', 'is_staff', 'date_joined')
+    list_display = ('email', 'surname', 'name', 'is_staff','is_active', 'date_joined')
     list_filter = ('is_staff','is_superuser', 'is_active', 'date_joined')
-    list_display_links = ('email', 'last_name')
-    search_fields = ('email', 'first_name', 'last_name')
+    list_display_links = ('email', 'surname')
+    search_fields = ('email', 'name', 'surname')
     ordering = ('-date_joined',)
 
     fieldsets = (
@@ -23,12 +23,12 @@ class UserAdmin(BaseUserAdmin):
         }),
         ('Личная информация', {
             'fields': (
-                'first_name',
-                'last_name',
+                'name',
+                'surname',
                 'avatar',
-                'bio',
+                'about',
                 'phone',
-                'github',
+                'github_url',
             ),
         }),
         ('Права', {
@@ -50,8 +50,8 @@ class UserAdmin(BaseUserAdmin):
             'classes': ('wide',),
             'fields': (
                 'email',
-                'first_name',
-                'last_name',
+                'name',
+                'surname',
                 'password1',
                 'password2',
             ),
@@ -61,7 +61,6 @@ class UserAdmin(BaseUserAdmin):
     inlines = (UserSkillInline,)
 
 
-
 class SkillAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
@@ -69,9 +68,9 @@ class SkillAdmin(admin.ModelAdmin):
 
 
 class UserSkillAdmin(admin.ModelAdmin):
-    list_display = ('user', 'skill', 'created_at','updated_at')
+    list_display = ('user', 'skill', 'created_at')
     list_filter = ('skill', 'created_at')
-    search_fields = ('user__email', 'skill__name', 'user__last_name')
+    search_fields = ('user__email', 'skill__name', 'user__surname')
     autocomplete_fields =('user', 'skill')
     ordering = ('-created_at',)
 
