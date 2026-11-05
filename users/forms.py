@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import authenticate
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from .models import User
 
@@ -18,7 +19,7 @@ class UserRegistrationForm(forms.ModelForm):
         user.set_password(self.cleaned_data['password'])
         if commit:
             user.save()
-        return user    
+        return user
 
 
 class UserLoginForm(AuthenticationForm):
@@ -30,6 +31,26 @@ class UserLoginForm(AuthenticationForm):
         super().__init__(*args,**kwargs)
         self.fields['email'] = self.fields.pop('username')
         self.fields['email'].label = 'Email'
+
+    def clean(self):
+        email = self.cleaned_data.get('email')
+        password = self.cleaned_data.get('password')
+
+        if email is not None and password:
+            self.user_cache = authenticate(
+                self.request,
+                username=email,
+                password=password
+            )
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'username': 'Email'},
+                )
+            else:
+                self.confirm_login_allowed(self.user_cache)
+        return self.cleaned_data
 
 
 class UserProfileForm(forms.ModelForm):
@@ -44,7 +65,7 @@ class UserProfileForm(forms.ModelForm):
             'github_url'
         )
         widgets = {
-            'about': forms.Textarea(atts={'rows': 4}),
+            'about': forms.Textarea(attrs={'rows': 4}),
         }
 
 
