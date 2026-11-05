@@ -11,8 +11,9 @@ class UserSkillInline(admin.TabularInline):
 
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ('email', 'surname', 'name', 'is_staff','is_active', 'date_joined')
-    list_filter = ('is_staff','is_superuser', 'is_active', 'date_joined')
+    list_display = ('email', 'surname', 'name',
+                    'is_staff', 'is_active', 'date_joined')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'date_joined')
     list_display_links = ('email', 'surname')
     search_fields = ('email', 'name', 'surname')
     ordering = ('-date_joined',)
@@ -71,7 +72,7 @@ class UserSkillAdmin(admin.ModelAdmin):
     list_display = ('user', 'skill', 'created_at')
     list_filter = ('skill', 'created_at')
     search_fields = ('user__email', 'skill__name', 'user__surname')
-    autocomplete_fields =('user', 'skill')
+    autocomplete_fields = ('user', 'skill')
     ordering = ('-created_at',)
 
 

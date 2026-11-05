@@ -9,6 +9,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 # Create your models here.
+
+
 def user_avatar_path(instance, filename):
     return f'avatars/{filename}'
 
@@ -68,7 +70,7 @@ class User(AbstractUser):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS =['name', 'surname', 'phone']
+    REQUIRED_FIELDS = ['name', 'surname', 'phone']
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -79,9 +81,9 @@ class User(AbstractUser):
         # ] # индексы для базы данных
 
     def __str__(self):
-        return f'{self.surname} {self.name}'.strip() or self.email
+        return f'{self.name} {self.surname}'.strip() or self.email
 
-    def save(self,*args, **kwargs):
+    def save(self, *args, **kwargs):
         """Генерируется аватар при первом сохр"""
         if not self.pk and not self.avatar:
             self.avatar = self._generate_avatar()
@@ -90,7 +92,7 @@ class User(AbstractUser):
     def _generate_avatar(self):
         size = 200
         color = tuple(random.randint(60, 140) for _ in range(3))
-        image = Image.new('RGB', (size,size), color)
+        image = Image.new('RGB', (size, size), color)
         draw = ImageDraw.Draw(image)
         letter = (self.name)[0].upper()
 
@@ -120,21 +122,21 @@ class Skill(models.Model):
     name = models.CharField('Название', max_length=50, unique=True)
 
     class Meta:
-        verbose_name='Навык'
-        verbose_name_plural='Навыки'
+        verbose_name = 'Навык'
+        verbose_name_plural = 'Навыки'
         ordering = ['name']
 
     def __str__(self):
         return self.name
 
 
-class UserSkill(models.Model):  
+class UserSkill(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='user_skills',
         verbose_name='Пользователь',
-    ) 
+    )
     skill = models.ForeignKey(
         Skill,
         on_delete=models.CASCADE,

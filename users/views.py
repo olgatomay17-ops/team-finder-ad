@@ -99,7 +99,7 @@ class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     def get_success_url(self):
         return reverse_lazy(
             'users:detail', kwargs={'pk': self.request.user.pk}
-        )    
+        )
 
 
 def get_profile_redirect(request):

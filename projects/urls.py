@@ -12,6 +12,8 @@ urlpatterns = [
     path('<int:pk>', views.ProjectDetailView.as_view(), name='detail'),
     path('<int:pk>/edit/', views.ProjectUpdateView.as_view(), name='edit'),
     path('<int:pk>/complete/', views.complete_project, name='complete'),
-    path('<int:pk>/toggle-participate/', views.toggle_participate, name='toggle_participate'),
-    path('<int:pk>/toggle-favorite/', views.toggle_favorite, name='toggle_favorite'),
+    path('<int:pk>/toggle-participate/',
+         views.toggle_participate, name='toggle_participate'),
+    path('<int:pk>/toggle-favorite/',
+         views.toggle_favorite, name='toggle_favorite'),
 ]

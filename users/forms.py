@@ -12,7 +12,7 @@ class UserRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('name','surname', 'email')
+        fields = ('name', 'surname', 'email')
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -27,8 +27,9 @@ class UserLoginForm(AuthenticationForm):
         label='Email',
         widget=forms.EmailInput(attrs={'autofocus': True}),
     )
+
     def __init__(self, *args, **kwargs):
-        super().__init__(*args,**kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['email'] = self.fields.pop('username')
         self.fields['email'].label = 'Email'
 

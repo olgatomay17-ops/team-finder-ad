@@ -17,13 +17,19 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Project',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=200, verbose_name='Название')),
-                ('description', models.TextField(blank=True, verbose_name='Описание')),
-                ('status', models.CharField(choices=[('open', 'Открыт'), ('closed', 'Закрыт')], default='open', max_length=10, verbose_name='Статус')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Дата обновления')),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='owned_projects', to=settings.AUTH_USER_MODEL, verbose_name='Автор')),
+                ('description', models.TextField(
+                    blank=True, verbose_name='Описание')),
+                ('status', models.CharField(choices=[
+                 ('open', 'Открыт'), ('closed', 'Закрыт')], default='open', max_length=10, verbose_name='Статус')),
+                ('created_at', models.DateTimeField(
+                    auto_now_add=True, verbose_name='Дата публикации')),
+                ('updated_at', models.DateTimeField(
+                    auto_now=True, verbose_name='Дата обновления')),
+                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                 related_name='owned_projects', to=settings.AUTH_USER_MODEL, verbose_name='Автор')),
             ],
             options={
                 'verbose_name': 'Проект',
@@ -34,10 +40,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ProjectMembership',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('joined_at', models.DateTimeField(auto_now_add=True, verbose_name='Дата присоединения')),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='membership', to='projects.project', verbose_name='Проект')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Участник')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
+                ('joined_at', models.DateTimeField(
+                    auto_now_add=True, verbose_name='Дата присоединения')),
+                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                 related_name='membership', to='projects.project', verbose_name='Проект')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                 to=settings.AUTH_USER_MODEL, verbose_name='Участник')),
             ],
             options={
                 'verbose_name': 'Участник проекта',
@@ -48,10 +58,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='project',
             name='participations',
-            field=models.ManyToManyField(related_name='participating_projects', through='projects.ProjectMembership', to=settings.AUTH_USER_MODEL, verbose_name='Участники'),
+            field=models.ManyToManyField(related_name='participating_projects',
+                                         through='projects.ProjectMembership', to=settings.AUTH_USER_MODEL, verbose_name='Участники'),
         ),
         migrations.AddConstraint(
             model_name='projectmembership',
-            constraint=models.UniqueConstraint(fields=('user', 'project'), name='unique_user_project_membership'),
+            constraint=models.UniqueConstraint(
+                fields=('user', 'project'), name='unique_user_project_membership'),
         ),
     ]

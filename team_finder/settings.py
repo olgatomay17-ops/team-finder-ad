@@ -14,7 +14,8 @@ ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'users.User'
 
 LOGIN_URL = 'users:login'
-LOGIN_REDIRECT_URL = 'users:list'      # временно 'users:list', пока нет projects:home
+# временно 'users:list', пока нет projects:home
+LOGIN_REDIRECT_URL = 'projects:home'
 LOGOUT_REDIRECT_URL = 'users:login'
 # Application definition
 

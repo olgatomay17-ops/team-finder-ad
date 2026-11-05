@@ -72,7 +72,7 @@ class FavoriteProjectView(LoginRequiredMixin, ListView):
 
 @login_required
 @require_POST
-@csrf_exempt 
+@csrf_exempt
 def toggle_favorite(request, pk):
     project = get_object_or_404(Project, pk=pk)
     user = request.user
@@ -93,7 +93,7 @@ def toggle_favorite(request, pk):
 def complete_project(request, pk):
     project = get_object_or_404(Project, pk=pk)
     if project.owner != request.user:
-        return JsonResponse({'status': 'error', 'message': 'Вы не автором'}, status=403)  
+        return JsonResponse({'status': 'error', 'message': 'Вы не автором'}, status=403)
     project.status = 'closed'
     project.save()
     return JsonResponse({'status': 'ok'})
@@ -107,10 +107,10 @@ def toggle_participate(request, pk):
     if project.status == 'closed':
         return JsonResponse({'status': 'error', 'message': 'Проект закрыт'})
     if project.owner == request.user:
-                return JsonResponse({'status': 'error', 'message': 'Вы автор'}, status=400)
-    
+        return JsonResponse({'status': 'error', 'message': 'Вы автор'}, status=400)
+
     membership = ProjectMembership.objects.filter(
-    user=request.user, project=project
+        user=request.user, project=project
     ).first()
 
     if membership:

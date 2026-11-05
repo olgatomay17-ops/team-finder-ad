@@ -3,6 +3,7 @@ from django.conf import settings
 
 User = settings.AUTH_USER_MODEL
 
+
 class Project(models.Model):
 
     STATUS_CHOICES = (
