@@ -1,6 +1,8 @@
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
+
 from users.models import User
+
 from .models import Project, ProjectMembership
 
 
@@ -37,7 +39,8 @@ class ProjectViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_project_edit_by_other_user(self):
-        """Другой пользователь НЕ может редактировать проект (403 Forbidden)."""
+        """Другой пользователь НЕ может
+        редактировать проект (403 Forbidden)."""
         self.client.login(email='viewer@example.com', password='password123')
         response = self.client.get(
             reverse('projects:edit', kwargs={'pk': self.project.pk}))
@@ -78,3 +81,22 @@ class ProjectViewTest(TestCase):
 
         # Проверяем, что проект добавился в favorites у пользователя
         self.assertIn(self.project, self.viewer.favorites.all())
+
+    def test_favorite_requires_csrf_token(self):
+        csrf_client = Client(enforce_csrf_checks=True)
+
+        csrf_client.login(
+            email='viewer@example.com',
+            password='password123'
+        )
+
+        # Запрос без CSRF-токена
+        response = csrf_client.post(
+            reverse(
+                'projects:toggle_favorite',
+                kwargs={'pk': self.project.pk}
+            ),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 403)

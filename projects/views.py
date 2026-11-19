@@ -1,21 +1,19 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse_lazy
-from django.views import View
-from django.contrib import messages
-from .models import Project, ProjectMembership
-from .forms import ProjectForm
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.views.decorators.http import require_POST
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
+
+from .forms import ProjectForm
+from .models import Project, ProjectMembership
 
 
 class ProjectListView(ListView):
     model = Project
     template_name = 'projects/project_list.html'
-    context_object_name = 'page_obj'
+    context_object_name = 'projects'
     paginate_by = 12
 
 
@@ -72,7 +70,6 @@ class FavoriteProjectView(LoginRequiredMixin, ListView):
 
 @login_required
 @require_POST
-@csrf_exempt
 def toggle_favorite(request, pk):
     project = get_object_or_404(Project, pk=pk)
     user = request.user
@@ -89,11 +86,13 @@ def toggle_favorite(request, pk):
 
 @login_required
 @require_POST
-@csrf_exempt
 def complete_project(request, pk):
     project = get_object_or_404(Project, pk=pk)
     if project.owner != request.user:
-        return JsonResponse({'status': 'error', 'message': 'Вы не автором'}, status=403)
+        return JsonResponse(
+            {'status': 'error', 'message': 'Вы не автор.'},
+            status=403
+        )
     project.status = 'closed'
     project.save()
     return JsonResponse({'status': 'ok'})
@@ -101,13 +100,19 @@ def complete_project(request, pk):
 
 @login_required
 @require_POST
-@csrf_exempt
 def toggle_participate(request, pk):
     project = get_object_or_404(Project, pk=pk)
     if project.status == 'closed':
-        return JsonResponse({'status': 'error', 'message': 'Проект закрыт'})
+        return JsonResponse(
+            {'status': 'error', 'message': 'Проект закрыт'},
+            status=400
+        )
+
     if project.owner == request.user:
-        return JsonResponse({'status': 'error', 'message': 'Вы автор'}, status=400)
+        return JsonResponse(
+            {'status': 'error', 'message': 'Нельзя вступить в свой проект'},
+            status=400
+        )
 
     membership = ProjectMembership.objects.filter(
         user=request.user, project=project

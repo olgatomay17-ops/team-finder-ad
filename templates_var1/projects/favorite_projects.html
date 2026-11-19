@@ -15,13 +15,20 @@
     </div>
     <p class="project-subtitle">Проекты, которые вас заинтересовали</p>
 
+
     <div class="projects-grid">
         {% for project in projects %}
-        {% include 'includes/project-card.html' %}
+            {% include 'includes/project-card.html' %}
         {% empty %}
-        {% include 'includes/empty-project-card.html' with empty_title="Пока нет избранных проектов" empty_message="Добавляйте проекты в избранное, чтобы не потерять их" button_link="/projects/list" button_text="Посмотреть проекты" %}
+            {% include 'includes/empty-project-card.html' with empty_title="Пока нет избранных проектов" empty_message="Добавляйте проекты в избранное, чтобы не потерять их" button_link="/projects/list" button_text="Посмотреть проекты" %}
         {% endfor %}
+
+        <!-- Скрытый блок, который появится после удаления последнего проекта -->
+        <div id="empty-favorite-template" style="display: none;">
+            {% include 'includes/empty-project-card.html' with empty_title="Пока нет избранных проектов" empty_message="Добавляйте проекты в избранное, чтобы не потерять их" button_link="/projects/list" button_text="Посмотреть проекты" %}
+        </div>
     </div>
+
 
     {% include 'includes/project-fav-toggle.js' %}
 </div>

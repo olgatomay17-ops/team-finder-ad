@@ -1,9 +1,11 @@
-from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
-from .forms import UserLoginForm, UserPasswordChangeForm, UserProfileForm, UserRegistrationForm
+
+from .forms import (UserLoginForm, UserPasswordChangeForm, UserProfileForm,
+                    UserRegistrationForm)
 from .models import User
 
 
@@ -71,11 +73,6 @@ class UserDetailView(DetailView):
     model = User
     template_name = 'users/user-details.html'
     pk_url_kwarg = 'pk'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['owned_projects'] = self.object.owned_projects.all().distinct()
-        return context
 
 
 class UserUdpateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):

@@ -1,13 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Skill, UserSkill
+
+from .models import User
+
 # Register your models here.
-
-
-class UserSkillInline(admin.TabularInline):
-    model = UserSkill
-    extra = 1
-    autocomplete_fields = ('skill',)
 
 
 class UserAdmin(BaseUserAdmin):
@@ -59,23 +55,5 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
-    inlines = (UserSkillInline,)
-
-
-class SkillAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-    ordering = ('name',)
-
-
-class UserSkillAdmin(admin.ModelAdmin):
-    list_display = ('user', 'skill', 'created_at')
-    list_filter = ('skill', 'created_at')
-    search_fields = ('user__email', 'skill__name', 'user__surname')
-    autocomplete_fields = ('user', 'skill')
-    ordering = ('-created_at',)
-
 
 admin.site.register(User, UserAdmin)
-admin.site.register(Skill, SkillAdmin)
-admin.site.register(UserSkill, UserSkillAdmin)

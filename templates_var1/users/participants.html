@@ -56,7 +56,12 @@
                 {% endif %}
             </div>
             <div class="participant-info">
-                <h3 class="participant-name">{{ participant.name }} {{ participant.surname }}</h3>
+                <a href="/users/{{ participant.id }}"
+                    class="participant-name-link">
+                    <h3 class="participant-name">
+                        {{ participant.name }} {{ participant.surname }}
+                    </h3>
+                </a>
                 <p class="participant-role">{{ participant.about|truncatechars:80 }}</p>
             </div>
             <div class="participant-card-footer">

@@ -1,4 +1,7 @@
 /team_finder/media/
+/media/
+
+*.pyc
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

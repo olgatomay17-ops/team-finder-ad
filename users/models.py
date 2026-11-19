@@ -1,12 +1,13 @@
-import os
 import io
+import os
 import random
 import uuid
-from PIL import Image, ImageDraw, ImageFont
-from django.core.files.base import ContentFile
-from django.contrib.staticfiles import finders
-from django.db import models
+
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.staticfiles import finders
+from django.core.files.base import ContentFile
+from django.db import models
+from PIL import Image, ImageDraw, ImageFont
 
 # Create your models here.
 
@@ -76,9 +77,6 @@ class User(AbstractUser):
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
         ordering = ['-date_joined']
-        # indexes = [
-        #     models.Index(fields=['-date_joined']),
-        # ] # индексы для базы данных
 
     def __str__(self):
         return f'{self.name} {self.surname}'.strip() or self.email
@@ -116,45 +114,3 @@ class User(AbstractUser):
             buffer.getvalue(),
             name=f'avatar_{uuid.uuid4()}.png',
         )
-
-
-class Skill(models.Model):
-    name = models.CharField('Название', max_length=50, unique=True)
-
-    class Meta:
-        verbose_name = 'Навык'
-        verbose_name_plural = 'Навыки'
-        ordering = ['name']
-
-    def __str__(self):
-        return self.name
-
-
-class UserSkill(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='user_skills',
-        verbose_name='Пользователь',
-    )
-    skill = models.ForeignKey(
-        Skill,
-        on_delete=models.CASCADE,
-        related_name='user_skills',
-        verbose_name='Навык',
-    )
-    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
-
-    class Meta:
-        verbose_name = 'Навык пользователя'
-        verbose_name_plural = 'Навыки пользователей'
-        ordering = ['-created_at']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'skill'],
-                name='unique_user_skill'
-            ),
-        ]
-
-    def __str__(self):
-        return f'{self.user} - {self.skill}'
