@@ -6,12 +6,11 @@ from django.urls import include, path
 from projects.views import ProjectListView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('users/', include('users.urls')),
-    path('projects/', include('projects.urls')),
-    path('', ProjectListView.as_view(), name='home'),
+    path("admin/", admin.site.urls),
+    path("users/", include("users.urls")),
+    path("projects/", include("projects.urls")),
+    path("", ProjectListView.as_view(), name="home"),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -13,7 +13,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 def user_avatar_path(instance, filename):
-    return f'avatars/{filename}'
+    return f"avatars/{filename}"
 
 
 class UserManager(BaseUserManager):
@@ -21,7 +21,7 @@ class UserManager(BaseUserManager):
 
     def _create_user(self, email, password, **extra_fields):
         if not email:
-            raise ValueError('Email обязателен')
+            raise ValueError("Email обязателен")
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -29,15 +29,15 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', False)
-        extra_fields.setdefault('is_superuser', False)
-        extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+        extra_fields.setdefault("is_active", True)
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
         return self._create_user(email, password, **extra_fields)
 
 
@@ -47,39 +47,39 @@ class User(AbstractUser):
     last_name = None
 
     email = models.EmailField(
-        'Email',
+        "Email",
         unique=True,
-        help_text='Необходимо для входа в систему',
+        help_text="Необходимо для входа в систему",
     )
-    name = models.CharField('Имя', max_length=124)
-    surname = models.CharField('Фамилия', max_length=124)
+    name = models.CharField("Имя", max_length=124)
+    surname = models.CharField("Фамилия", max_length=124)
     avatar = models.ImageField(
         "Аватар",
         upload_to=user_avatar_path,
         blank=True,
     )
-    about = models.TextField('О себе', blank=True, max_length=256)
-    phone = models.CharField('Телефон', max_length=12)
-    github_url = models.URLField('GitHub', blank=True)
+    about = models.TextField("О себе", blank=True, max_length=256)
+    phone = models.CharField("Телефон", max_length=12)
+    github_url = models.URLField("GitHub", blank=True)
     favorites = models.ManyToManyField(
-        'projects.Project',
-        related_name='favorited_by',
+        "projects.Project",
+        related_name="favorited_by",
         blank=True,
-        verbose_name='Избранные проекты'
+        verbose_name="Избранные проекты",
     )
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name', 'surname', 'phone']
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["name", "surname", "phone"]
 
     class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
-        ordering = ['-date_joined']
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
+        ordering = ["-date_joined"]
 
     def __str__(self):
-        return f'{self.name} {self.surname}'.strip() or self.email
+        return f"{self.name} {self.surname}".strip() or self.email
 
     def save(self, *args, **kwargs):
         """Генерируется аватар при первом сохр"""
@@ -90,13 +90,11 @@ class User(AbstractUser):
     def _generate_avatar(self):
         size = 200
         color = tuple(random.randint(60, 140) for _ in range(3))
-        image = Image.new('RGB', (size, size), color)
+        image = Image.new("RGB", (size, size), color)
         draw = ImageDraw.Draw(image)
         letter = (self.name)[0].upper()
 
-        fontPath = finders.find(
-            'fonts/Neue_Haas_Grotesk_Display_Pro_75_Bold.otf'
-        )
+        fontPath = finders.find("fonts/Neue_Haas_Grotesk_Display_Pro_75_Bold.otf")
         font = (
             ImageFont.truetype(fontPath, 110)
             if fontPath and os.path.exists(fontPath)
@@ -109,8 +107,8 @@ class User(AbstractUser):
         draw.text((x, y), letter, fill=(255, 255, 255), font=font)
 
         buffer = io.BytesIO()
-        image.save(buffer, format='PNG')
+        image.save(buffer, format="PNG")
         return ContentFile(
             buffer.getvalue(),
-            name=f'avatar_{uuid.uuid4()}.png',
+            name=f"avatar_{uuid.uuid4()}.png",
         )

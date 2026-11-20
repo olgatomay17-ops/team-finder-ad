@@ -7,52 +7,66 @@ from .models import User
 
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ('email', 'surname', 'name',
-                    'is_staff', 'is_active', 'date_joined')
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'date_joined')
-    list_display_links = ('email', 'surname')
-    search_fields = ('email', 'name', 'surname')
-    ordering = ('-date_joined',)
+    list_display = ("email", "surname", "name", "is_staff", "is_active", "date_joined")
+    list_filter = ("is_staff", "is_superuser", "is_active", "date_joined")
+    list_display_links = ("email", "surname")
+    search_fields = ("email", "name", "surname")
+    ordering = ("-date_joined",)
 
     fieldsets = (
-        (None, {
-            'fields': ('email', 'password'),
-        }),
-        ('Личная информация', {
-            'fields': (
-                'name',
-                'surname',
-                'avatar',
-                'about',
-                'phone',
-                'github_url',
-            ),
-        }),
-        ('Права', {
-            'fields': (
-                'is_active',
-                'is_staff',
-                'is_superuser',
-                'groups',
-                'user_permissions',
-            ),
-        }),
-        ('Даты', {
-            'fields': ('last_login', 'date_joined'),
-        }),
+        (
+            None,
+            {
+                "fields": ("email", "password"),
+            },
+        ),
+        (
+            "Личная информация",
+            {
+                "fields": (
+                    "name",
+                    "surname",
+                    "avatar",
+                    "about",
+                    "phone",
+                    "github_url",
+                ),
+            },
+        ),
+        (
+            "Права",
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        (
+            "Даты",
+            {
+                "fields": ("last_login", "date_joined"),
+            },
+        ),
     )
 
     add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': (
-                'email',
-                'name',
-                'surname',
-                'password1',
-                'password2',
-            ),
-        }),
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "email",
+                    "name",
+                    "surname",
+                    "password1",
+                    "password2",
+                ),
+            },
+        ),
     )
 
 

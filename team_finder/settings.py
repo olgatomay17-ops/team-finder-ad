@@ -12,12 +12,12 @@ DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = []
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = "users.User"
 
-LOGIN_URL = 'users:login'
+LOGIN_URL = "users:login"
 # временно 'users:list', пока нет projects:home
-LOGIN_REDIRECT_URL = 'projects:home'
-LOGOUT_REDIRECT_URL = 'users:login'
+LOGIN_REDIRECT_URL = "projects:home"
+LOGOUT_REDIRECT_URL = "users:login"
 # Application definition
 
 INSTALLED_APPS = [
@@ -48,9 +48,7 @@ TEMPLATES_DIR = BASE_DIR / "templates_var1"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            BASE_DIR / f"templates_var{config('TASK_VERSION',default='1')}"
-            ],
+        "DIRS": [BASE_DIR / f"templates_var{config('TASK_VERSION',default='1')}"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -89,25 +87,17 @@ if not DEBUG:
         [
             {
                 "NAME": (
-                    "django.contrib.auth.password_validation."
-                    "UserAttributeSimilarityValidator"
-                         ),
+                    "django.contrib.auth.password_validation." "UserAttributeSimilarityValidator"
+                ),
             },
             {
-                "NAME": (
-                    "django.contrib.auth.password_validation."
-                    "MinimumLengthValidator"
-                         ),
+                "NAME": ("django.contrib.auth.password_validation." "MinimumLengthValidator"),
             },
             {
-                "NAME": (
-                    "django.contrib.auth.password_validation."
-                    "CommonPasswordValidator"),
+                "NAME": ("django.contrib.auth.password_validation." "CommonPasswordValidator"),
             },
             {
-                "NAME": (
-                    "django.contrib.auth.password_validation."
-                    "NumericPasswordValidator"),
+                "NAME": ("django.contrib.auth.password_validation." "NumericPasswordValidator"),
             },
         ]
     )
