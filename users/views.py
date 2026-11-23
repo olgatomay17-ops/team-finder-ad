@@ -7,7 +7,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from .forms import UserLoginForm, UserPasswordChangeForm, UserProfileForm, UserRegistrationForm
 from .models import User
 
-USER_PER_PAGE = 12
+USERS_PER_PAGE = 12
 
 FILTER_OWNERS_OF_FAVORITE_PROJECTS = "owners-of-favorite-projects"
 FILTER_OWNERS_OF_PARTICIPATING_PROJECTS = "owners-of-participating-projects"
@@ -35,7 +35,7 @@ class CustomLogoutView(LogoutView):
 class UserListView(ListView):
     model = User
     template_name = "users/participants.html"
-    paginate_by = USER_PER_PAGE
+    paginate_by = USERS_PER_PAGE
 
     def get_queryset(self):
         qs = super().get_queryset()
