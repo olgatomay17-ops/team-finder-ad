@@ -1,20 +1,34 @@
+from http import HTTPStatus
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from .forms import ProjectForm
-from .models import Project, ProjectMembership
+from .models import PROJECT_STATUS_CLOSED, Project
+
+PROJECTS_PER_PAGE = 12
+
+
+def get_project_or_error(pk):
+    project = Project.objects.filter(pk=pk).first()
+
+    if project is None:
+        return None, JsonResponse(
+            {"status": "error", "message": "Проект не найден"},
+            status=HTTPStatus.NOT_FOUND,
+        )
+    return project, None
 
 
 class ProjectListView(ListView):
     model = Project
     template_name = "projects/project_list.html"
     context_object_name = "projects"
-    paginate_by = 12
+    paginate_by = PROJECTS_PER_PAGE
 
 
 class ProjectDetailView(DetailView):
@@ -34,7 +48,7 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy("projects:detail", kwargs={"pk": self.object.pk})
+        return reverse("projects:detail", kwargs={"pk": self.object.pk})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -52,7 +66,7 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return self.request.user == project.owner
 
     def get_success_url(self):
-        return reverse_lazy("projects:detail", kwargs={"pk": self.object.pk})
+        return reverse("projects:detail", kwargs={"pk": self.object.pk})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -71,49 +85,68 @@ class FavoriteProjectView(LoginRequiredMixin, ListView):
 @login_required
 @require_POST
 def toggle_favorite(request, pk):
-    project = get_object_or_404(Project, pk=pk)
-    user = request.user
+    project, error_response = get_project_or_error(pk)
 
-    if project in user.favorites.all():
+    if error_response:
+        return error_response
+
+    user = request.user
+    is_favorite = user.favorites.filter(pk=project.pk).exists()
+
+    if is_favorite:
         user.favorites.remove(project)
-        is_favorite = False
     else:
         user.favorites.add(project)
-        is_favorite = True
 
-    return JsonResponse({"status": "ok", "is_favorite": is_favorite})
+    return JsonResponse({"status": "ok", "is_favorite": not is_favorite})
 
 
 @login_required
 @require_POST
 def complete_project(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project, error_response = get_project_or_error(pk)
+
+    if error_response:
+        return error_response
+
     if project.owner != request.user:
-        return JsonResponse({"status": "error", "message": "Вы не автор."}, status=403)
-    project.status = "closed"
+        return JsonResponse(
+            {"status": "error", "message": "Вы не автор."},
+            status=HTTPStatus.FORBIDDEN,
+        )
+
+    project.status = PROJECT_STATUS_CLOSED
     project.save()
+
     return JsonResponse({"status": "ok"})
 
 
 @login_required
 @require_POST
 def toggle_participate(request, pk):
-    project = get_object_or_404(Project, pk=pk)
-    if project.status == "closed":
-        return JsonResponse({"status": "error", "message": "Проект закрыт"}, status=400)
+    project, error_response = get_project_or_error(pk)
+
+    if error_response:
+        return error_response
+
+    if project.status == PROJECT_STATUS_CLOSED:
+        return JsonResponse(
+            {"status": "error", "message": "Проект закрыт"},
+            status=HTTPStatus.BAD_REQUEST,
+        )
 
     if project.owner == request.user:
         return JsonResponse(
-            {"status": "error", "message": "Нельзя вступить в свой проект"}, status=400
+            {"status": "error", "message": "Нельзя вступить в свой проект"},
+            status=HTTPStatus.BAD_REQUEST,
         )
 
-    membership = ProjectMembership.objects.filter(user=request.user, project=project).first()
+    membership = project.membership.filter(user=request.user).first()
+    is_participant = membership is not None
 
     if membership:
         membership.delete()
-        is_participant = False
     else:
-        ProjectMembership.objects.create(user=request.user, project=project)
-        is_participant = True
+        project.membership.create(user=request.user)
 
-    return JsonResponse({"status": "ok", "participant": is_participant})
+    return JsonResponse({"status": "ok", "participant": not is_participant})

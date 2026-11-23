@@ -1,15 +1,13 @@
-import io
-import os
-import random
-import uuid
-
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.contrib.staticfiles import finders
-from django.core.files.base import ContentFile
 from django.db import models
-from PIL import Image, ImageDraw, ImageFont
 
-# Create your models here.
+from .utils import generate_avatar
+
+USER_NAME_MAX_LENGTH = 124
+USER_SURNAME_MAX_LENGTH = 124
+
+USER_BIO_MAX_LENGTH = 256
+USER_PHONE_MAX_LENGTH = 12
 
 
 def user_avatar_path(instance, filename):
@@ -51,15 +49,28 @@ class User(AbstractUser):
         unique=True,
         help_text="Необходимо для входа в систему",
     )
-    name = models.CharField("Имя", max_length=124)
-    surname = models.CharField("Фамилия", max_length=124)
+    name = models.CharField(
+        "Имя",
+        max_length=USER_NAME_MAX_LENGTH,
+    )
+    surname = models.CharField(
+        "Фамилия",
+        max_length=USER_SURNAME_MAX_LENGTH,
+    )
     avatar = models.ImageField(
         "Аватар",
         upload_to=user_avatar_path,
         blank=True,
     )
-    about = models.TextField("О себе", blank=True, max_length=256)
-    phone = models.CharField("Телефон", max_length=12)
+    about = models.TextField(
+        "О себе",
+        blank=True,
+        max_length=USER_BIO_MAX_LENGTH,
+    )
+    phone = models.CharField(
+        "Телефон",
+        max_length=USER_PHONE_MAX_LENGTH,
+    )
     github_url = models.URLField("GitHub", blank=True)
     favorites = models.ManyToManyField(
         "projects.Project",
@@ -84,31 +95,5 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         """Генерируется аватар при первом сохр"""
         if not self.pk and not self.avatar:
-            self.avatar = self._generate_avatar()
+            self.avatar = generate_avatar(self.name)
         super().save(*args, **kwargs)
-
-    def _generate_avatar(self):
-        size = 200
-        color = tuple(random.randint(60, 140) for _ in range(3))
-        image = Image.new("RGB", (size, size), color)
-        draw = ImageDraw.Draw(image)
-        letter = (self.name)[0].upper()
-
-        fontPath = finders.find("fonts/Neue_Haas_Grotesk_Display_Pro_75_Bold.otf")
-        font = (
-            ImageFont.truetype(fontPath, 110)
-            if fontPath and os.path.exists(fontPath)
-            else ImageFont.load_default()
-        )
-
-        bbox = draw.textbbox((0, 0), letter, font=font)
-        x = (size - (bbox[2] - bbox[0])) / 2 - bbox[0]
-        y = (size - (bbox[3] - bbox[1])) / 2 - bbox[1]
-        draw.text((x, y), letter, fill=(255, 255, 255), font=font)
-
-        buffer = io.BytesIO()
-        image.save(buffer, format="PNG")
-        return ContentFile(
-            buffer.getvalue(),
-            name=f"avatar_{uuid.uuid4()}.png",
-        )

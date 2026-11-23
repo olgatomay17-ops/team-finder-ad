@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -38,7 +40,7 @@ class UserViewTest(TestCase):
     def test_register_page(self):
         """Проверяем доступность страницы регистрации."""
         response = self.client.get(reverse("users:register"))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "users/register.html")
 
     def test_login_and_redirect(self):
@@ -47,12 +49,12 @@ class UserViewTest(TestCase):
         response = self.client.post(
             reverse("users:login"), {"email": "test@example.com", "password": "password123"}
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
     def test_profile_page(self):
         """Проверяем страницу профиля."""
         response = self.client.get(reverse("users:detail", kwargs={"pk": self.user.pk}))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "Иван Иванов")
 
 

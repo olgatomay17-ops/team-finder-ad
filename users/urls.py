@@ -12,5 +12,5 @@ urlpatterns = [
     path("change-password/", views.CustomPasswordChangeView.as_view(), name="change_password"),
     path("edit-profile/", views.get_profile_redirect, name="edit_profile"),
     path("<int:pk>/", views.UserDetailView.as_view(), name="detail"),
-    path("<int:pk>/edit/", views.UserUdpateView.as_view(), name="edit"),
+    path("<int:pk>/edit/", views.UserUpdateView.as_view(), name="edit"),
 ]

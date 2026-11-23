@@ -1,23 +1,37 @@
 from django.conf import settings
 from django.db import models
 
+PROJECT_NAME_MAX_LENGTH = 200
+PROJECT_STATUS_MAX_LENGTH = 10
+PROJECT_STATUS_OPEN = "open"
+PROJECT_STATUS_CLOSED = "closed"
+
+
 User = settings.AUTH_USER_MODEL
 
 
 class Project(models.Model):
 
     STATUS_CHOICES = (
-        ("open", "Открыт"),
-        ("closed", "Закрыт"),
+        (PROJECT_STATUS_OPEN, "Открыт"),
+        (PROJECT_STATUS_CLOSED, "Закрыт"),
     )
 
-    name = models.CharField("Название", max_length=200)
+    name = models.CharField("Название", max_length=PROJECT_NAME_MAX_LENGTH)
     description = models.TextField("Описание", blank=True)
     github_url = models.URLField("Ссылка на GitHub", blank=True)
     owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="owned_projects", verbose_name="Автор"
+        User,
+        on_delete=models.CASCADE,
+        related_name="owned_projects",
+        verbose_name="Автор",
     )
-    status = models.CharField("Статус", max_length=10, choices=STATUS_CHOICES, default="open")
+    status = models.CharField(
+        "Статус",
+        max_length=PROJECT_STATUS_MAX_LENGTH,
+        choices=STATUS_CHOICES,
+        default=PROJECT_STATUS_OPEN,
+    )
     created_at = models.DateTimeField("Дата публикации", auto_now_add=True)
     updated_at = models.DateTimeField("Дата обновления", auto_now=True)
 

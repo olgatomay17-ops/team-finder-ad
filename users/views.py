@@ -1,11 +1,18 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from .forms import UserLoginForm, UserPasswordChangeForm, UserProfileForm, UserRegistrationForm
 from .models import User
+
+USER_PER_PAGE = 12
+
+FILTER_OWNERS_OF_FAVORITE_PROJECTS = "owners-of-favorite-projects"
+FILTER_OWNERS_OF_PARTICIPATING_PROJECTS = "owners-of-participating-projects"
+FILTER_INTERESTED_IN_MY_PROJECTS = "interested-in-my-projects"
+FILTER_PARTICIPANTS_OF_MY_PROJECTS = "participants-of-my-projects"
 
 
 class RegisterView(CreateView):
@@ -28,7 +35,7 @@ class CustomLogoutView(LogoutView):
 class UserListView(ListView):
     model = User
     template_name = "users/participants.html"
-    paginate_by = 12
+    paginate_by = USER_PER_PAGE
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -39,13 +46,13 @@ class UserListView(ListView):
 
         user = self.request.user
 
-        if filter_type == "owners-of-favorite-projects":
+        if filter_type == FILTER_OWNERS_OF_FAVORITE_PROJECTS:
             qs = qs.filter(owned_projects__in=user.favorites.all()).distinct()
-        elif filter_type == "owners-of-participating-projects":
+        elif filter_type == FILTER_OWNERS_OF_PARTICIPATING_PROJECTS:
             qs = qs.filter(owned_projects__participants=user).distinct()
-        elif filter_type == "interested-in-my-projects":
+        elif filter_type == FILTER_INTERESTED_IN_MY_PROJECTS:
             qs = qs.filter(favorites__in=user.owned_projects.all()).distinct()
-        elif filter_type == "participants-of-my-projects":
+        elif filter_type == FILTER_PARTICIPANTS_OF_MY_PROJECTS:
             qs = qs.filter(participating_projects__in=user.owned_projects.all()).distinct()
 
         return qs
@@ -64,7 +71,7 @@ class UserDetailView(DetailView):
     pk_url_kwarg = "pk"
 
 
-class UserUdpateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class UserUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = User
     form_class = UserProfileForm
     template_name = "users/edit_profile.html"
@@ -75,7 +82,7 @@ class UserUdpateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return self.request.user.pk == self.kwargs["pk"]
 
     def get_success_url(self):
-        return reverse_lazy("users:detail", kwargs={"pk": self.object.pk})
+        return reverse("users:detail", kwargs={"pk": self.object.pk})
 
 
 class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
@@ -83,7 +90,7 @@ class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     form_class = UserPasswordChangeForm
 
     def get_success_url(self):
-        return reverse_lazy("users:detail", kwargs={"pk": self.request.user.pk})
+        return reverse("users:detail", kwargs={"pk": self.request.user.pk})
 
 
 def get_profile_redirect(request):
